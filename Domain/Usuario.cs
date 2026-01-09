@@ -1,4 +1,6 @@
-﻿namespace ApiTeste.Domain
+﻿using System.Text.Json.Serialization;
+
+namespace ApiTeste.Domain
 {
     public class Usuario
     {
@@ -7,6 +9,7 @@
         public string Email { get; set; }
         public string Telefone { get; set; }
         public DateTime DataCadastro { get; set; } = DateTime.UtcNow;
+        [JsonIgnore]
         public ICollection<Compra> Compras { get; set; }
     }
 }

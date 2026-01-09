@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ApiTeste.Domain;
+using System.ComponentModel.DataAnnotations;
 
 public class CriarCompraDto
 {
@@ -7,4 +8,5 @@ public class CriarCompraDto
 
     [Required]
     public int ProdutoId { get; set; }
+
 }

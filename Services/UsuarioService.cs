@@ -14,6 +14,14 @@ public class UsuarioService : IUsuarioService
 
     public async Task<Usuario> CriarAsync(CriarUsuarioDto dto)
     {
+        var emailExiste = await _context.Usuarios
+            .AnyAsync(u => u.Email.ToLower() == dto.Email.ToLower());
+
+        if (emailExiste)
+        {
+            throw new InvalidOperationException("Falha ao criar usuário");
+        }
+
         var usuario = new Usuario
         {
             Nome = dto.Nome,
@@ -29,6 +37,9 @@ public class UsuarioService : IUsuarioService
 
     public async Task<List<Usuario>> ListarAsync()
     {
-        return await _context.Usuarios.ToListAsync();
+        return await _context.Usuarios
+            .AsNoTracking()
+            .OrderBy(u => u.Id)
+            .ToListAsync();
     }
 }

@@ -1,4 +1,5 @@
-﻿using ApiTeste.Services.Interfaces;
+﻿using ApiTeste.Domain;
+using ApiTeste.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -15,19 +16,66 @@ public class ComprasController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Criar(CriarCompraDto dto)
     {
-        var compra = await _service.CriarAsync(dto);
-        return Ok(compra);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ErrorResponse(
+                "Dados inválidos"
+            ));
+        }
+
+        try
+        {
+            Compra compra = await _service.CriarAsync(dto);
+            return StatusCode(201, compra);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorResponse(
+                "Erro ao criar compra",
+                ex.Message
+            ));
+        }
     }
 
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        return Ok(await _service.ListarAsync());
+        try
+        {
+            List<Compra> compras = await _service.ListarAsync();
+            return Ok(compras);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorResponse(
+                "Erro ao listar compras",
+                ex.Message
+            ));
+        }
     }
 
     [HttpGet("ultima")]
     public async Task<IActionResult> ListarUltima()
     {
-        return Ok(await _service.ListarUltimaAsync());
+        try
+        {
+            Compra compra = await _service.ListarUltimaAsync();
+
+            if (compra == null)
+            {
+                return NotFound(new ErrorResponse(
+                    "Nenhuma compra encontrada"
+                ));
+            }
+
+            return Ok(compra);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorResponse(
+                "Erro ao buscar última compra",
+                ex.Message
+            ));
+        }
     }
 }

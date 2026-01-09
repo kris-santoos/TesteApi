@@ -1,4 +1,5 @@
-﻿using ApiTeste.Services.Interfaces;
+﻿using ApiTeste.Domain;
+using ApiTeste.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -15,13 +16,42 @@ public class ProdutosController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Criar(CriarProdutoDto dto)
     {
-        var produto = await _service.CriarAsync(dto);
-        return Ok(produto);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(new ErrorResponse(
+                "Dados inválidos",
+                string.Join("; ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))
+            ));
+        }
+
+        try
+        {
+            Produto produto = await _service.CriarAsync(dto);
+            return StatusCode(201, produto);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorResponse(
+                "Erro ao criar produto",
+                ex.Message
+            ));
+        }
     }
 
     [HttpGet]
     public async Task<IActionResult> Listar()
     {
-        return Ok(await _service.ListarAsync());
+        try
+        {
+            List<Produto> produtos = await _service.ListarAsync();
+            return Ok(produtos);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorResponse(
+                "Erro ao listar produtos",
+                ex.Message
+            ));
+        }
     }
 }

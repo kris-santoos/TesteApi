@@ -14,7 +14,7 @@ public class ProdutoService : IProdutoService
 
     public async Task<Produto> CriarAsync(CriarProdutoDto dto)
     {
-        var produto = new Produto
+        Produto produto = new Produto
         {
             Nome = dto.Nome,
             Descricao = dto.Descricao
@@ -28,6 +28,9 @@ public class ProdutoService : IProdutoService
 
     public async Task<List<Produto>> ListarAsync()
     {
-        return await _context.Produtos.ToListAsync();
+        return await _context.Produtos
+            .AsNoTracking()
+            .OrderBy(p => p.Id)
+            .ToListAsync();
     }
 }
